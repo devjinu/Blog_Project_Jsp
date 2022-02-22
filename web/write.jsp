@@ -79,7 +79,7 @@
                 </thead>
                 <tbody>
                 <tr>
-                    <td><input type="text" class="form-control" placeholder="글 제목" name="title" maxlength="50"></td>
+                    <td><input type="text" class="form-control" placeholder="글 제목" name="boardTitle" maxlength="50"></td>
                 </tr>
                 <tr>
                     <td><textarea class="form-control" placeholder="글 내용" name="content" maxlength="2048" height="350em;"></textarea></td>

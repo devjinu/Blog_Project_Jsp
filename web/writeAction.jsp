@@ -29,14 +29,14 @@
         writer.println("location.href='login.jsp'");
         writer.println("</script>");
     }else {
-        if(board.getBoardTitle() ==null || board.getContent() == null){
+        if(board.getBoardTitle() == null || board.getContent() == null){
             writer.println("<script>");
             writer.println("alert('입력이 되지 않은 사항이 있습니다')");
             writer.println("history.back();");
             writer.println("</script>");
         }else {
             boardDAO boardDAO = new boardDAO();
-            int result = boardDAO.write(board.getBoardTitle(), board.getUserId(), board.getContent());
+            int result = boardDAO.write(board.getBoardTitle(),userId, board.getContent());
             if(result ==-1){
                 writer.println("<script>");
                 writer.println("alert('글쓰기에 실패하였습니다')");
