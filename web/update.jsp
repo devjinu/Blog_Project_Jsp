@@ -7,6 +7,8 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.io.PrintWriter" %>
+<%@ page import="board.boardDAO" %>
+<%@ page import="board.Board" %>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html" ; charset="UTF-8">
@@ -16,9 +18,35 @@
 </head>
 <body>
 <%
+    int boardId = 0;
     String userId = null;
+    PrintWriter writer = response.getWriter();
     if (session.getAttribute("userId") != null) {
         userId = (String) session.getAttribute("userId");
+    }
+    if (userId == null) {
+        writer.println("<script>");
+        writer.println("alert('로그인을 해주세요.')");
+        writer.println("location.href='login.jsp'");
+        writer.println("</script>");
+    }
+    System.out.println("update.jsp boardId 파라미터값 넣기 전: "+boardId);
+    if (request.getParameter("boardId") != null) {
+        boardId = Integer.parseInt(request.getParameter("boardId"));
+    }
+    System.out.println("update.jsp boardId 파라미터값 넣은 후 : "+boardId);
+    if (boardId == 0) {
+        writer.println("<script>");
+        writer.println("alert('유효하지 않은 글입니다.')");
+        writer.println("location.href='board.jsp'");
+        writer.println("</script>");
+    }
+    Board board = new boardDAO().getBoard(boardId);
+    if (!userId.equals(board.getUserId())) {
+        writer.println("<script>");
+        writer.println("alert('권한이 없습니다.')");
+        writer.println("location.href='board.jsp'");
+        writer.println("</script>");
     }
 %>
 <nav class="navbar navbar-default">
@@ -37,22 +65,6 @@
             <li><a href="main.jsp">메인</a></li>
             <li class="active"><a href="board.jsp">게시판</a></li>
         </ul>
-        <%
-            if (userId == null) {
-        %>
-        <ul class="nav navbar-nav navbar-right">
-            <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                   aria-expanded="false">접속하기<span class="caret"></span></a>
-                <ul class="dropdown-menu">
-                    <li class="active"><a href="login.jsp">로그인</a></li>
-                    <li><a href="join.jsp">회원가입</a></li>
-                </ul>
-            </li>
-        </ul>
-        <%
-        } else {
-        %>
         <ul class="nav navbar-nav navbar-right">
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
@@ -62,30 +74,30 @@
                 </ul>
             </li>
         </ul>
-        <%
-            }
-        %>
     </div>
 </nav>
 <div class="container">
     <div class="row">
-        <form method="post" action="writeAction.jsp">
+        <form method="post" action="updateAction.jsp?boardId=<%=boardId%>">
             <table class="table table-striped" style="text-align: center" border="1px solid #dddddd">
                 <thead>
                 <tr>
-                    <th colspan="2" style="background-color: #eeeeee; text-align: center">게시판 글쓰기 양식</th>
+                    <th colspan="2" style="background-color: #eeeeee; text-align: center">게시판 글 수정 양식</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr>
-                    <td><input type="text" class="form-control" placeholder="글 제목" name="boardTitle" maxlength="50"></td>
+                    <td><input type="text" class="form-control" placeholder="글 제목" name="boardTitle" maxlength="50"
+                               value="<%=board.getBoardTitle()%>">
+                    </td>
                 </tr>
                 <tr>
-                    <td><textarea class="form-control" placeholder="글 내용" name="content" maxlength="2048" height="350em;"></textarea></td>
+                    <td><textarea class="form-control" placeholder="글 내용" name="content" maxlength="2048"
+                                  height="350em;" value="<%=board.getContent()%>"></textarea></td>
                 </tr>
                 </tbody>
             </table>
-            <input type="submit" class="btn btn-primary pull-right" value="글쓰기">
+            <input type="submit" class="btn btn-primary pull-right" value="수정하기">
         </form>
     </div>
 </div>
