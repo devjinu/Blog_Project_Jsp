@@ -1,6 +1,7 @@
 package board;
 
 import java.sql.*;
+import java.util.ArrayList;
 
 public class boardDAO {
     private Connection conn;
@@ -62,6 +63,66 @@ public class boardDAO {
             e.printStackTrace();
         }
         return -1; // DB오류
+    }
+
+    public ArrayList<Board> getList(int pageNumber){
+        String sql = "select * from board where boardid < ? and available = 1 order by userid desc limit 10";
+        ArrayList<Board> list = new ArrayList<Board>();
+        try{
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1,getNext() - (pageNumber - 1) * 10);
+            rs = pstmt.executeQuery();
+            while (rs.next()){
+                Board board = new Board();
+                board.setBoardId(rs.getInt(1));
+                board.setBoardTitle(rs.getString(2));
+                board.setUserId(rs.getString(3));
+                board.setDate(rs.getDate(4));
+                board.setContent(rs.getString(5));
+                board.setAvailable(rs.getInt(6));
+                list.add(board);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public boolean nextPage(int pageNumber){
+        String sql ="select * from board where boardid < ? and available = 1";
+        try {
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, getNext() - (pageNumber - 1) * 10 );
+            rs = pstmt.executeQuery();
+            if(rs.next()){
+                return true;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public Board getBoard(int boardId){
+        String sql = "select * from board where boardid = ?";
+        try {
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1,boardId);
+            rs = pstmt.executeQuery();
+            if(rs.next()){
+                Board board = new Board();
+                board.setBoardId(rs.getInt(1));
+                board.setBoardTitle(rs.getString(2));
+                board.setUserId(rs.getString(3));
+                board.setDate(rs.getDate(4));
+                board.setContent(rs.getString(5));
+                board.setAvailable(rs.getInt(6));
+                return board;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

@@ -6,35 +6,34 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="board.boardDAO" %>
-<%@ page import="board.Board" %>
-<%@ page import="java.util.ArrayList" %>
 <%@ page import="java.io.PrintWriter" %>
-
+<%@ page import="board.Board" %>
+<%@ page import="board.boardDAO" %>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html" ; charset="UTF-8">
     <meta name="viewprot" content="width=device-width" , initial-scale="1">
     <link rel="stylesheet" href="css/bootstrap.css">
     <title>JSP 게시판 웹사이트</title>
-    <style type="text/css">
-        a, a:hover{
-            color: #000000;
-            text-decoration: none;
-        }
-    </style>
 </head>
 <body>
 <%
-
+    PrintWriter writer = response.getWriter();
     String userId = null;
     if (session.getAttribute("userId") != null) {
         userId = (String) session.getAttribute("userId");
     }
-    int pageNumber = 1;
-    if (request.getParameter("pageNumber") != null) {
-        pageNumber = Integer.parseInt(request.getParameter("pageNumber"));
+    int boardId = 0;
+    if (request.getParameter("boardId") != null) {
+        boardId = Integer.parseInt(request.getParameter("boardId"));
     }
+    if (boardId == 0) {
+        writer.println("<script>");
+        writer.println("alert('유효하지 않은 글입니다.')");
+        writer.println("location.href='board.jsp'");
+        writer.println("</script>");
+    }
+    Board board = new boardDAO().getBoard(boardId);
 %>
 <nav class="navbar navbar-default">
     <div class="navbar-header">
@@ -87,46 +86,42 @@
         <table class="table table-striped" style="text-align: center" border="1px solid #dddddd">
             <thead>
             <tr>
-                <th style="background-color: #eeeeee; text-align: center">번호</th>
-                <th style="background-color: #eeeeee; text-align: center">제목</th>
-                <th style="background-color: #eeeeee; text-align: center">작성자</th>
-                <th style="background-color: #eeeeee; text-align: center">작성일</th>
+                <th colspan="3" style="background-color: #eeeeee; text-align: center">게시판 글 보기</th>
             </tr>
             </thead>
             <tbody>
-            <%
-                boardDAO boardDAO = new boardDAO();
-                ArrayList<Board> list = boardDAO.getList(pageNumber);
-                for (int i = 0; i < list.size(); i++) {
-            %>
             <tr>
-                <td><%= list.get(i).getBoardId()%>
-                </td>
-                <td><a href="view.jsp?boardId=<%=list.get(i).getBoardId()%>"><%= list.get(i).getBoardTitle().replaceAll(" ", "&nbsp;".replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll("\n", "<br>"))%>
-                </a></td>
-                <td><%= list.get(i).getUserId()%>
-                </td>
-                <td><%= list.get(i).getDate()%>
+                <td style="width: 20%;">글 제목</td>
+                <td colspan="2"><%= board.getBoardTitle()%>
                 </td>
             </tr>
-            <%
-                }
-            %>
+            <tr>
+                <td>작성자</td>
+                <td colspan="2"><%= board.getUserId()%>
+                </td>
+            </tr>
+            <tr>
+                <td>작성일</td>
+                <td colspan="2"><%= board.getDate()%>
+                </td>
+            </tr>
+            <tr>
+                <td>내용</td>
+                <td colspan="2" style="min-height: 200px; text-align: left"><%= board.getContent().replaceAll(" ", "&nbsp;".replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll("\n", "<br>"))%>
+                </td>
+            </tr>
             </tbody>
         </table>
+        <a href="board.jsp" class="btn btn-primary">목록</a>
         <%
-            if (pageNumber != 1) {
+            if (userId != null && userId.equals(board.getUserId())) {
         %>
-        <a href="board.jsp?pageNumber=<%=pageNumber - 1 %>" class="btn btn-success btn-arrow-left">이전</a>
-        <%
-            }
-            if (boardDAO.nextPage(pageNumber +1)) {
+        <a href="update.jsp?boardId=<%=boardId%>" class="btn btn-primary">수정</a>
+        <a href="deleteAction.jsp?boardId=<%=boardId%>" class="btn btn-primary">삭제</a>
+                <%
+        }
         %>
-        <a href="board.jsp?pageNumber=<%=pageNumber + 1 %>" class="btn btn-success btn-arrow-left">다음</a>
-        <%
-            }
-        %>
-        <a href="write.jsp" class="btn btn-primary pull-right">글쓰기</a>
+            <input type="submit" class="btn btn-primary pull-right" value="글쓰기">
     </div>
 </div>
 <script src="https://code.juery.com/jquery-3.1.1.min.js"></script>

@@ -20,10 +20,8 @@
 <%
 
     String userId = null;
-    System.out.println("세션 전 아이디 : "+userId);
-    if (session.getAttribute("userId") != null) {
-        userId = (String) session.getAttribute("userId");
-        System.out.println("세션 후 아이디 : "+userId);
+    if(session.getAttribute("userID") != null){
+        userId = (String)session.getAttribute("userId");
     }
 
 %>
@@ -41,7 +39,7 @@
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
         <ul class="nav navbar-nav">
             <li><a href="main.jsp">메인</a>
-            <li><a href="main.jsp">게시판</a>
+            <li><a href="board.jsp">게시판</a>
         </ul>
         <%
             if(userId == null) {
